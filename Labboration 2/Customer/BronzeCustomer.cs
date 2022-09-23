@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Laboration_2.Customer
+namespace Laboration_2
 {
-    internal class BronzeCustomer
+    public class BronzeCustomer : Customer
     {
+        public BronzeCustomer(string name, string password) : base(name, password)
+        {
+        }
     }
 }

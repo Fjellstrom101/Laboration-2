@@ -2,23 +2,45 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
-namespace Laboration_2.Customer
+namespace Laboration_2
 {
     public class CustomerCollection
     {
         private List<Customer> _customerList;
+        private string _fileName = "Customers.json";
 
         public CustomerCollection()
         {
             _customerList = new List<Customer>();
-            _customerList.Add(new Customer("Linus", "hej"));
+
+            if (File.Exists(_fileName))
+            {
+                //Sparade kunder finns. Vi hämtar dom
+                FetchSavedCustomersFromFile();
+            }
+            else
+            {
+                //Första uppstarten? Skapar förinlagda kunder
+                _customerList.Add(new Customer("Knatte", "123"));
+                _customerList.Add(new Customer("Fnatte", "321"));
+                _customerList.Add(new Customer("Tjatte", "213"));
+            }
         }
 
-        public void FetchSavedCustomers()
+        public void FetchSavedCustomersFromFile()
         {
 
+            string fileInput = File.ReadAllText(_fileName);
+            _customerList = JsonSerializer.Deserialize<List<Customer>>(fileInput)!;
+        }
+        public void SaveCustomersToFile()
+        {
+            //Gör om listan till en json array och sparar ner till en textfil
+            File.WriteAllText(_fileName, JsonSerializer.Serialize(_customerList));
         }
 
         public void AddNewCustomer(Customer newCustomer)
@@ -31,12 +53,24 @@ namespace Laboration_2.Customer
 
         public bool CustomerExists(string name)
         {
+            //Om det finns en kund med matchande användarnamn så returneras True
             return _customerList.Any(customer => customer.Name.Equals(name));
         }
 
-        public bool PasswordIsMatching(string name, string password)
+        public bool TryGetCustomer(string name, string password, out Customer outCustomer)
         {
-            return _customerList.Any(customer => customer.Name.Equals(name) && customer.Password.Equals(password));
+            outCustomer = _customerList.Find(customer => customer.Name.Equals(name));
+
+            if (outCustomer != null)
+            {
+                return outCustomer.VerifyPassword(password);
+            }
+
+            return false;
+        }
+        public Customer GetCustomer(string name, string password)
+        {
+            return _customerList.Find(customer => customer.Name.Equals(name) && customer.Password.Equals(password));
         }
 
     }

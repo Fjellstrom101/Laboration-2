@@ -109,13 +109,14 @@ namespace Laboration_2
                     else
                     {
                         ClearConsole();
-                        Console.WriteLine($"Kunden existerar inte. Vill du registrera dig?");
-                        if (WriteMenu(new string[] { "JA", "NEJ" })==0)
+                        Console.WriteLine($"Kunden existerar inte. Vill du registrera dig som ny kund?");
+                        if (WriteMenu(new string[] { "Ja", "Nej" })==0)
                         {
 
                         }
 
                     }
+                    Thread.Sleep(1000);
 
                     ClearConsole();
                 }

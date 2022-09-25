@@ -1,5 +1,4 @@
 ﻿
-
 namespace Laboration_2
 {
     internal class Program
@@ -10,28 +9,30 @@ namespace Laboration_2
             Login,
             Register,
             MainMenu,
+            Shop,
             Cart,
+            Checkout,
             Exit
         }
 
         private static MenuState _menuState;
-        private static int _menuPosition = 0;
         private static CustomerCollection _customerCollection;
         private static Customer _currentCustomer;
+        private static ProductCollection _productCollection;
 
         static void Main(string[] args)
         {
             _customerCollection = new();
-            
+            _productCollection = new();
 
             while (_menuState != MenuState.Exit)
             {
                 if (_menuState == MenuState.LoginMenu)
                 {
                  
-                    switch (WriteMenu(new string[] { "Logga in", "Registrera ny kund" },
+                    switch (WriteMenu(new string[] { "Logga in", "Registrera ny kund"},
                         "Välkommen!",
-                        "\nAnvänd piltangenterna och ENTER för att välja.\nTryck ESC för att avsluta"))
+                        "\nAnvänd piltangenterna och ENTER för att välja.\nTryck ESC för att avsluta", true))
                     {
                         case -1:
                             _menuState = MenuState.Exit;
@@ -77,26 +78,30 @@ namespace Laboration_2
                         ClearConsole();
                         Console.WriteLine($"Kunden existerar inte. Vill du registrera dig som ny kund?");
 
-                        if (WriteMenu(new string[] { "Ja", "Nej" })==0)
+                        if (WriteMenu(new string[] { "Ja", "Nej" }, false)==0)
                         {
                             ClearConsole();
-                            int customerLevel = WriteMenu(new string[] { "Basic", "Bronze", "Silver", "Guld" }, "Var god välj kundnivå:", "\nTryck ESC för att avbryta");
+                            int customerLevel = WriteMenu(new string[] { "Basic", "Bronze", "Silver", "Guld" }, "Var god välj kundnivå:", "\nTryck ESC för att avbryta", true);
                             switch (customerLevel)
                             {
                                 case 0:
-                                    _customerCollection.AddNewCustomer(new Customer(inUsername, inPassword));
+                                    _currentCustomer = new Customer(inUsername, inPassword);
+                                    _customerCollection.AddNewCustomer(_currentCustomer);
                                     _menuState = MenuState.MainMenu;
                                     break;
                                 case 1:
-                                    _customerCollection.AddNewCustomer(new BronzeCustomer(inUsername, inPassword));
+                                    _currentCustomer = new Customer(inUsername, inPassword);
+                                    _customerCollection.AddNewCustomer(_currentCustomer);
                                     _menuState = MenuState.MainMenu;
                                     break;
                                 case 2:
-                                    _customerCollection.AddNewCustomer(new SilverCustomer(inUsername, inPassword));
+                                    _currentCustomer = new Customer(inUsername, inPassword);
+                                    _customerCollection.AddNewCustomer(_currentCustomer);
                                     _menuState = MenuState.MainMenu;
                                     break;
                                 case 3:
-                                    _customerCollection.AddNewCustomer(new GoldCustomer(inUsername, inPassword));
+                                    _currentCustomer = new Customer(inUsername, inPassword);
+                                    _customerCollection.AddNewCustomer(_currentCustomer);
                                     _menuState = MenuState.MainMenu;
                                     break;
                             }
@@ -118,9 +123,45 @@ namespace Laboration_2
                 }
                 else if (_menuState == MenuState.MainMenu)
                 {
-                    WriteMenu(new string[] { "Handla", "Visa Kundvagn","Gå till kassan", "Ändra valuta", "Logga ut"}, $"Välkommen {_currentCustomer.Name}!", "");
+                    int menuChoice = WriteMenu(new string[] { "Handla", "Visa Kundvagn", "Gå till kassan", "Ändra valuta", "Logga ut" }, $"Välkommen {_currentCustomer.Name}!", "", false);
+                    switch (menuChoice)
+                    {
+                        case 0:
+                            _menuState = MenuState.Shop;
+                            break;
+                        case 1:
+                            _menuState = MenuState.Cart;
+                            break;
+                        case 2:
+                            _menuState = MenuState.Checkout;
+                            break;
+                        case 3:
+
+                            ClearConsole();
+                            _currentCustomer.currency = (Currecies) WriteMenu(new string[] { "SEK", "EUR", "GBP", "USD" }, false);
+                            break;
+
+                        case 4://Logga ut
+
+                            _currentCustomer = null; // TODO: ÄNDRA kanske? Måste jag nollställa. Kontrollera
+                            _customerCollection.SaveCustomersToFile();
+                            _menuState = MenuState.LoginMenu;
+                            break;
+
+                    }
+                    ClearConsole();
+
+                }
+                else if (_menuState == MenuState.Shop)
+                {
                 }
                 else if (_menuState == MenuState.Cart)
+                {
+                    _currentCustomer.GetCartInfo();
+                    Thread.Sleep(1000);
+                    _menuState = MenuState.MainMenu;
+                }
+                else if (_menuState == MenuState.Checkout)
                 {
 
                 }
@@ -152,11 +193,11 @@ namespace Laboration_2
             }
         }
 
-        private static int WriteMenu(string[] menuStrings)
+        private static int WriteMenu(string[] menuStrings, bool useESC)
         {
-            return WriteMenu(menuStrings, string.Empty, string.Empty);
+            return WriteMenu(menuStrings, string.Empty, string.Empty, useESC);
         }
-        private static int WriteMenu(string[] menuStrings, string preMenuMessage, string postMenuMessage)
+        private static int WriteMenu(string[] menuStrings, string preMenuMessage, string postMenuMessage, bool useESC)
         {
             int selectedIndex = 0;
             Console.CursorVisible = false;
@@ -185,7 +226,12 @@ namespace Laboration_2
                 switch (Console.ReadKey(true).Key)
                 {
                     case ConsoleKey.Escape:
-                        return -1;
+                        if (useESC)
+                        {
+                            return -1;
+                        }
+
+                        break;
                     case ConsoleKey.UpArrow:
                         if (selectedIndex > 0)
                         {

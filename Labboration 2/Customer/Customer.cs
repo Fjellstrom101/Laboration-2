@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Laboration_2
 {
     public class Customer
@@ -28,6 +23,15 @@ namespace Laboration_2
         {
             return 0;
         }
+
+        public string GetCartInfo()
+        {
+            string retString = string.Empty;
+            Console.WriteLine(string.Format("{0,-20} {1,-10} {2,-10} {3, -10} \n",
+                "Namn", "Antal", "Pris", "Valuta"));
+
+            return retString;
+        }
         public bool VerifyPassword(string password)
         {
             return Password.Equals(password);
@@ -35,6 +39,7 @@ namespace Laboration_2
         public override string ToString()
         {
             String retString = $"Användarnamn: {Name} Lösenord: {Password}\n";
+            retString += GetCartInfo();
             return retString;
         }
     }

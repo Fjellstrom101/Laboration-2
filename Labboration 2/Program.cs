@@ -1,4 +1,7 @@
 ﻿
+using Laboration_2.CurrencyClasses;
+using Laboration_2.MenuClasses;
+
 namespace Laboration_2
 {
     internal class Program
@@ -24,8 +27,11 @@ namespace Laboration_2
         {
             _customerCollection = new();
             _productCollection = new();
+            Menu menu = new Menu();
+            menu.ShowLoginMenu();
+            Console.ReadKey();
 
-            while (_menuState != MenuState.Exit)
+            while (_menuState != MenuState.Exit && false)
             {
                 if (_menuState == MenuState.LoginMenu)
                 {
@@ -138,7 +144,7 @@ namespace Laboration_2
                         case 3:
 
                             ClearConsole();
-                            _currentCustomer.currency = (Currecies) WriteMenu(new string[] { "SEK", "EUR", "GBP", "USD" }, false);
+                            _currentCustomer.Currency = (Currecies) WriteMenu(new string[] { "SEK", "EUR", "GBP", "USD" }, false);
                             break;
 
                         case 4://Logga ut

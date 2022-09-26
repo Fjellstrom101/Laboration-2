@@ -5,13 +5,13 @@
         public string Name { get; set; }
         public decimal Price { get; set; }
 
-        public string Enhet { get; set; }
+        public string Unit { get; set; }
 
-        public Product(string name, decimal price, string enhet)
+        public Product(string name, decimal price, string unit)
         {
             Name = name;
             Price = price;
-            Enhet = enhet;
+            Unit = unit;
         }
     }
 }

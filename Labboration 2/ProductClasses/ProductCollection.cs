@@ -43,5 +43,23 @@ namespace Laboration_2
             string fileInput = File.ReadAllText(_fileName);
             _productList = JsonSerializer.Deserialize<List<Product>>(fileInput)!;
         }
+
+        public override string ToString()
+        {
+            string retString = string.Empty;
+
+            if (_productList.Count!=0)
+            {
+                retString += string.Format("{0,-20} {1,-10}\n",
+                    "Namn", "Pris");
+
+                foreach (var product in _productList)
+                {
+                    retString += string.Format("{0,-20} {1,-10}\n",
+                        product.Name, $"{product.Price} SEK/{product.Unit}");
+                }
+            }
+            return retString;
+        }
     }
 }

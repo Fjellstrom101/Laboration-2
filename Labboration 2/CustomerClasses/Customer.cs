@@ -11,17 +11,17 @@ namespace Laboration_2
 
         //private int Discount { get; set; }
 
-        private List<CartItem> _cart;
-        public List<CartItem> Cart { get { return _cart; } } //? Varför retunera hela listan?
+        private List<Product> _cart;
+        public List<Product> Cart { get { return _cart; } } //? Varför retunera hela listan?
 
         public Currecies Currency { get; set; }
         public Customer(string name, string password)
         {
             Name = name;
             Password = password;
-            _cart = new List<CartItem>();
+            _cart = new List<Product>();
             Currency = Currecies.SEK;
-            _cart.Add(new CartItem(new Product("Korv", 80m, "ST")));
+            _cart.Add(new Product("Korv", 80m, "ST"));
         }
         public decimal GetTotalPrice()
         {
@@ -34,15 +34,27 @@ namespace Laboration_2
 
             if (_cart.Count()!=0)
             {
-                retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -10} \n",
+                retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -20} \n",
                     "Namn", "Antal", "Pris", "Totalt");
 
 
-                foreach (var item in _cart)
+                int counter = 1;
+                for (int i = 0; i < _cart.Count; i++)
                 {
-                    retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -10} \n",
-                        item.CartProduct.Name, item.Amount, CurrencyConverter.ConvertTo(Currency, item.CartProduct.Price) + " " + Currency.ToString(), "Totalt");
+                    if (i == _cart.Count - 1 || _cart[i] != _cart[i + 1])
+                    {
+                        decimal convertedPrice = CurrencyConverter.ConvertTo(Currency, _cart[i].Price);
+                        retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -20} \n",
+                            _cart[i].Name, counter, convertedPrice.ToString("0.00") + " " + Currency.ToString(), (counter * convertedPrice).ToString("0.00"));
+                        
+                        counter = 1;
+                    }
+                    else
+                    {
+                        counter++;
+                    }
                 }
+
 
             }
             else

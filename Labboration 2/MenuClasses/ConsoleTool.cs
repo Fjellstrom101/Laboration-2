@@ -97,6 +97,10 @@ namespace Laboration_2
         {
             ClearConsoleToRow(0);
         }
+        public static void ClearNumberOfRows(int numberOfRows)
+        {
+            ClearConsoleToRow(Console.CursorTop-numberOfRows);
+        }
         public static void ClearConsoleToRow(int top)
         {
             for (int i = Console.CursorTop; i >= top; i--)

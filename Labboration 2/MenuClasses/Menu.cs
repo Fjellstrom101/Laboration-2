@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Laboration_2.CurrencyClasses;
+using Laboration_2.CustomerClasses;
 
 namespace Laboration_2.MenuClasses
 {
@@ -12,9 +13,10 @@ namespace Laboration_2.MenuClasses
         private List<MenuItem> _loginMenu;
         private List<MenuItem> _mainMenu;
 
-        private CustomerCollection _customerCollection;
+        private readonly CustomerCollection _customerCollection;
+        private readonly ProductCollection _productCollection;
+
         private Customer _currentCustomer;
-        private ProductCollection _productCollection;
 
         public Menu()
         {
@@ -114,6 +116,10 @@ namespace Laboration_2.MenuClasses
                             break;
                     }
                 }
+                else
+                {
+                    ShowLoginMenu();
+                }
             }
             else
             {
@@ -153,21 +159,46 @@ namespace Laboration_2.MenuClasses
 
         public void ShowShop()
         {
-            string[] productArray = new string[_productCollection.ProductList.Count];
+            string[] productMenuArray = new string[_productCollection.ProductList.Count];
 
-            for (int i = 0; i < productArray.Length; i++)
+            for (int i = 0; i < productMenuArray.Length; i++)
             {
                 Product temp = _productCollection.ProductList[i];
-                productArray[i] =  string.Format("{0,-20} {1,-10}",
+                productMenuArray[i] =  string.Format("{0,-20} {1,-10}",
                     temp.Name, $"{CurrencyConverter.ConvertTo(_currentCustomer.Currency, temp.Price)} {_currentCustomer.Currency.ToString()}/{temp.Unit}");
             }
 
             ConsoleTool.ClearConsole();
-            int userChoice = ConsoleTool.WriteMenu(productArray);
+            int userChoice = ConsoleTool.WriteMenu(productMenuArray);
 
             Console.WriteLine($"\nAnge antal {_productCollection.ProductList[userChoice].Unit}");
 
-            Console.ReadLine();
+            string inputAmount;
+
+            while (true)
+            {
+                if (int.TryParse(Console.ReadLine(), out int amount) && amount > 0)
+                {
+                    ConsoleTool.ClearConsole();
+                    Console.WriteLine($"{amount} {_productCollection.ProductList[userChoice].Unit} {_productCollection.ProductList[userChoice].Name} har lagts till i din kundvagn!");
+
+                    for (int j = 0; j < amount; j++)
+                    {
+                        _currentCustomer.Cart.Add(_productCollection.ProductList[userChoice]);
+                    }
+
+
+                    Thread.Sleep(1500);
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Felaktigt antal. Försök igen.");
+                    Thread.Sleep(1500);
+                    ConsoleTool.ClearNumberOfRows(2);
+                }
+            }
+            
             
             ShowMainMenu();
         }

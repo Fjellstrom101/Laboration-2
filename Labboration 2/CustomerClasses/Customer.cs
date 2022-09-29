@@ -9,10 +9,9 @@ namespace Laboration_2
         public string Name { get; set; } //Namn är unikt/key
         public string Password { get; set; }
 
-        //private int Discount { get; set; }
 
-        private List<Product> _cart;
-        public List<Product> Cart { get { return _cart; } } //? Varför retunera hela listan?
+        private readonly List<Product> _cart;
+        public readonly List<Product> Cart { get { return _cart; } } //? Varför retunera hela listan?
 
         public Currecies Currency { get; set; }
         public Customer(string name, string password)
@@ -21,7 +20,6 @@ namespace Laboration_2
             Password = password;
             _cart = new List<Product>();
             Currency = Currecies.SEK;
-            _cart.Add(new Product("Korv", 80m, "ST"));
         }
         public decimal GetTotalPrice()
         {
@@ -37,15 +35,20 @@ namespace Laboration_2
                 retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -20} \n",
                     "Namn", "Antal", "Pris", "Totalt");
 
+                _cart.Sort();
 
                 int counter = 1;
+                decimal totalPrice = 0;
+
                 for (int i = 0; i < _cart.Count; i++)
                 {
                     if (i == _cart.Count - 1 || _cart[i] != _cart[i + 1])
                     {
                         decimal convertedPrice = CurrencyConverter.ConvertTo(Currency, _cart[i].Price);
+                        totalPrice += convertedPrice*counter;
+
                         retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -20} \n",
-                            _cart[i].Name, counter, convertedPrice.ToString("0.00") + " " + Currency.ToString(), (counter * convertedPrice).ToString("0.00"));
+                            _cart[i].Name, counter, convertedPrice.ToString("0.00") + " " + Currency.ToString(), (counter * convertedPrice).ToString("0.00") + " " + Currency.ToString());
                         
                         counter = 1;
                     }
@@ -55,11 +58,14 @@ namespace Laboration_2
                     }
                 }
 
+                retString += string.Format("\n{0,-20} {1,-10} {2,-10} {3, -20} ",
+                    string.Empty, string.Empty, "Totalt:", $"{totalPrice} {Currency.ToString()}");
+
 
             }
             else
             {
-                retString += "Här var det tomt!";
+                retString += "Kundvagnen är tom!";
             }
 
             return retString;

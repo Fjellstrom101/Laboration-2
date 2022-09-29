@@ -60,11 +60,8 @@ namespace Laboration_2
                 return outCustomer.VerifyPassword(password);
             }
 
+            outCustomer = null;
             return false;
-        }
-        public Customer GetCustomer(string name, string password)
-        {
-            return _customerList.Find(customer => customer.Name.Equals(name) && customer.Password.Equals(password));
         }
 
     }

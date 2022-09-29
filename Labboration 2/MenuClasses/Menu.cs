@@ -128,16 +128,37 @@ namespace Laboration_2.MenuClasses
                 ShowLoginPage();
             }
         }
-
         public void ShowCart()
         {
             ConsoleTool.ClearConsole();
-            Console.WriteLine(_currentCustomer.GetCartInfo());
+            string[] cartArr = _currentCustomer.GetCartInfo().Split('\n');
+
+            if (cartArr.Length>1)
+            {
+                for (int i = 0; i < cartArr.Length; i++)
+                {
+                    if (i==0)
+                    {
+                        ConsoleTool.WriteInInvertedColors(cartArr[i]);
+                    }
+                    else
+                    {
+                        Console.WriteLine(cartArr[i]);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var row in cartArr)
+                {
+                    Console.WriteLine(row);
+                }
+            }
+
             Console.WriteLine("\nTryck på valfri tangent för att fortsätta");
             Console.ReadKey();
             ShowMainMenu();
         }
-
         public void ShowLogoutPage()
         {
             ConsoleTool.ClearConsole();
@@ -156,7 +177,6 @@ namespace Laboration_2.MenuClasses
             Thread.Sleep(1500);
             ShowMainMenu();
         }
-
         public void ShowShop()
         {
             string[] productMenuArray = new string[_productCollection.ProductList.Count];
@@ -202,6 +222,7 @@ namespace Laboration_2.MenuClasses
             
             ShowMainMenu();
         }
+
 
     }
 }

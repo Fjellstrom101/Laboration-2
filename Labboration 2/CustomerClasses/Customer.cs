@@ -8,8 +8,11 @@ namespace Laboration_2
         public string Password { get; set; }
 
 
-        private readonly List<Product> _cart;
-        public List<Product> Cart { get { return _cart; } }
+        private List<Product> _cart;
+        public List<Product> Cart { 
+            get { return _cart; }
+            set { _cart = value; }
+        }
 
         public Currecies Currency { get; set; }
         public Customer(string name, string password)

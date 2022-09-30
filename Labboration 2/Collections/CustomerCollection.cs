@@ -5,15 +5,13 @@ namespace Laboration_2
     public abstract class CustomerCollection
     {
         private static List<Customer> _customerList;
-        private static string _fileName = "Customers.json";
+        private static readonly string _fileName = "Customers.json";
 
 
-        public static void FetchSavedCustomersFromFile()
+        private static void FetchSavedCustomersFromFile()
         {
-            if (_customerList == null) //TODO Hur lösa? Skriva över lista, eller hur?
-            {
-                _customerList = new List<Customer>();
-            }
+
+            _customerList = new List<Customer>();
 
             if (File.Exists(_fileName))
             {

@@ -46,44 +46,50 @@ namespace Laboration_2
             Currecies currency = Currecies.SEK;
 
 
-            while (reader.Read())
+            if (!reader.Read() || reader.GetString() != "CustomerValue")
             {
-                if (reader.TokenType == JsonTokenType.EndObject)
-                {
-                    Customer customer = customerType switch
-                    {
-                        0 => new Customer(name, password),
-                        1 => new BronzeCustomer(name, password),
-                        2 => new SilverCustomer(name, password),
-                        3 => new GoldCustomer(name, password),
-                        _ => throw new JsonException()
-                    };
-                    customer.Currency = currency;
-
-                    return customer;
-                }
-
-                if (reader.TokenType == JsonTokenType.PropertyName)
-                {
-                    propertyName = reader.GetString();
-                    reader.Read();
-
-                    switch (propertyName)
-                    {
-                        case "Name":
-                            name = reader.GetString();
-                            break;
-                        case "Password":
-                            password = reader.GetString();
-                            break;
-                        case "Currency":
-                            currency = (Currecies)reader.GetInt32();
-                            break;
-                    }
-                }
+                throw new JsonException();
+            }
+            if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new JsonException();
             }
 
-            throw new JsonException();
+            Customer customer;
+
+            switch (customerType)
+            {
+                case 0:
+                    customer = (Customer)JsonSerializer.Deserialize(ref reader, typeof(Customer));
+                    break;
+                case 1:
+                    customer = (BronzeCustomer)JsonSerializer.Deserialize(ref reader, typeof(BronzeCustomer));
+                    break;
+                case 2:
+                    customer = (SilverCustomer)JsonSerializer.Deserialize(ref reader, typeof(SilverCustomer));
+                    break;
+                case 3:
+                    customer = (GoldCustomer)JsonSerializer.Deserialize(ref reader, typeof(GoldCustomer));
+                    break;
+                default: throw new JsonException();
+
+            }
+            /*Customer customer = customerType switch
+            {
+                0 => new Customer(name, password),
+                1 => new BronzeCustomer(name, password),
+                2 => new SilverCustomer(name, password),
+                3 => new GoldCustomer(name, password),
+                _ => throw new JsonException()
+            };*/
+
+            if (!reader.Read() || reader.TokenType != JsonTokenType.EndObject)
+            {
+                throw new JsonException();
+            }
+
+            return customer;
+
         }
 
         public override void Write(
@@ -97,6 +103,7 @@ namespace Laboration_2
             {
                 case BronzeCustomer:
                     writer.WriteNumber("CustomerLevel", 1);
+                    JsonSerializer.Serialize(writer, customer);
                     break;
                 case SilverCustomer:
                     writer.WriteNumber("CustomerLevel", 2);
@@ -110,9 +117,12 @@ namespace Laboration_2
                 default: throw new JsonException();
             }
 
-            writer.WriteString("Name", customer.Name);
+            writer.WritePropertyName("CustomerValue");
+            JsonSerializer.Serialize(writer, customer);
+
+            /*writer.WriteString("Name", customer.Name);
             writer.WriteString("Password", customer.Password); //Säkerhet 101
-            writer.WriteNumber("Currency", (int)customer.Currency);
+            writer.WriteNumber("Currency", (int)customer.Currency);*/
 
             /*
             writer.WriteStartArray("Cart");

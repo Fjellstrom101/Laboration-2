@@ -8,23 +8,32 @@ using System.Threading.Tasks;
 namespace Laboration_2
 {
 
-    internal class ProductCollection
+    public abstract class ProductCollection
     {
-        private List<Product> _productList;
+        private static List<Product> _productList;
 
-        public List<Product> ProductList
+        public static List<Product> ProductList
         {
-            get { return _productList; }
+            get
+            {
+                if (_productList == null)
+                {
+                    FetchProductsFromFile();
+                }
+                return _productList;
+            }
         }
 
-        private string _fileName = "Products.json";
-        
-        public ProductCollection()
+        private static string _fileName = "Products.json";
+
+        private static void FetchProductsFromFile()
         {
             _productList = new List<Product>();
 
             if (!File.Exists(_fileName))
             {
+                //Första gången programmet körs, eller om filen tagits bort
+
                 _productList.Add(new Product("Bananer", 26.95m, "KG"));
                 _productList.Add(new Product("Äpplen, Jonagold", 19.90m, "KG"));
                 _productList.Add(new Product("Coca Cola, 1,5L", 17.90m, "ST"));
@@ -32,23 +41,27 @@ namespace Laboration_2
                 _productList.Add(new Product("Marabou Mjölkchoklad", 19.50m, "ST"));
                 _productList.Add(new Product("Lökar, Gul", 12.90m, "KG"));
                 _productList.Add(new Product("Pågenlimpor", 35.90m, "ST"));
+
+                SaveProductsToFile(); //Skapar en fil med alla varor
             }
             else
             {
-                FetchProductsFromFile();
+                string fileInput = File.ReadAllText(_fileName);
+                _productList = JsonSerializer.Deserialize<List<Product>>(fileInput)!;
             }
         }
-        private void FetchProductsFromFile()
+
+        public static void SaveProductsToFile()
         {
-            string fileInput = File.ReadAllText(_fileName);
-            _productList = JsonSerializer.Deserialize<List<Product>>(fileInput)!;
+            var jsonString = JsonSerializer.Serialize(_productList);
+            File.WriteAllText(_fileName, jsonString);
         }
 
-        public override string ToString()
+        public static string ToString() //TODO Döpa om till något annat eftersom den inte overridar när den är statisk?
         {
             string retString = string.Empty;
 
-            if (_productList.Count!=0)
+            if (_productList.Count != 0)
             {
                 retString += string.Format("{0,-20} {1,-10}\n",
                     "Namn", "Pris");

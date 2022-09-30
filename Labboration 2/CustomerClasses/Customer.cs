@@ -1,17 +1,15 @@
 ﻿
-using Laboration_2.CurrencyClasses;
-using Laboration_2.CustomerClasses;
 
 namespace Laboration_2
 {
     public class Customer
     {
-        public string Name { get; set; } //Namn är unikt/key
+        public string Name { get; private set; }
         public string Password { get; set; }
 
 
         private readonly List<Product> _cart;
-        public readonly List<Product> Cart { get { return _cart; } } //? Varför retunera hela listan?
+        public List<Product> Cart { get { return _cart; } }
 
         public Currecies Currency { get; set; }
         public Customer(string name, string password)
@@ -21,9 +19,9 @@ namespace Laboration_2
             _cart = new List<Product>();
             Currency = Currecies.SEK;
         }
-        public decimal GetTotalPrice()
+        public virtual decimal GetTotalPrice()
         {
-            return 0;
+            return _cart.Sum(a => CurrencyConverter.ConvertTo(Currency,a.Price));
         }
 
         public string GetCartInfo()
@@ -48,7 +46,10 @@ namespace Laboration_2
                         totalPrice += convertedPrice*counter;
 
                         retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -20} \n",
-                            _cart[i].Name, counter, convertedPrice.ToString("0.00") + " " + Currency.ToString(), (counter * convertedPrice).ToString("0.00") + " " + Currency.ToString());
+                            _cart[i].Name,
+                            $"{counter} {_cart[i].Unit}",
+                            convertedPrice.ToString("0.00") + " " + Currency.ToString(),
+                            (counter * convertedPrice).ToString("0.00") + " " + Currency.ToString());
                         
                         counter = 1;
                     }
@@ -58,8 +59,14 @@ namespace Laboration_2
                     }
                 }
 
+                if (GetTotalPrice() != totalPrice)
+                {
+                    retString += string.Format("\n{0,-20} {1,-10} {2,-10} {3, -20} ",
+                        string.Empty, string.Empty, "Rabatt:", $"{totalPrice-GetTotalPrice()} {Currency.ToString()}");
+                }
+
                 retString += string.Format("\n{0,-20} {1,-10} {2,-10} {3, -20} ",
-                    string.Empty, string.Empty, "Totalt:", $"{totalPrice} {Currency.ToString()}");
+                    string.Empty, string.Empty, "Totalt:", $"{GetTotalPrice()} {Currency.ToString()}");
 
 
             }

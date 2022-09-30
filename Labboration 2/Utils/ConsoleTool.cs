@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Laboration_2.MenuClasses;
 
 namespace Laboration_2
 {
@@ -38,11 +37,8 @@ namespace Laboration_2
             int userChoice = WriteMenu(MenuItem.ToStringArray(inList), preMenuMessage, postMenuMessage);
             inList[userChoice].MenuMethod();
         }
-        public static int WriteMenu(string[] menuStrings)
-        {
-            return WriteMenu(menuStrings, string.Empty, string.Empty);
-        }
-        public static int WriteMenu(string[] menuStrings, string preMenuMessage, string postMenuMessage)
+
+        public static int WriteMenu(string[] menuStrings, string preMenuMessage = "", string postMenuMessage = "")
         {
             int selectedIndex = 0;
             Console.CursorVisible = false;

@@ -8,8 +8,8 @@ namespace Laboration_2
         public string Password { get; set; }
 
 
-        private List<Product> _cart;
-        public List<Product> Cart { 
+        private List<CartItem> _cart;
+        public List<CartItem> Cart { 
             get { return _cart; }
             set { _cart = value; }
         }
@@ -19,12 +19,26 @@ namespace Laboration_2
         {
             Name = name;
             Password = password;
-            _cart = new List<Product>();
+            _cart = new List<CartItem>();
             Currency = Currecies.SEK;
         }
         public virtual decimal GetTotalPrice()
         {
-            return _cart.Sum(a => CurrencyConverter.ConvertTo(Currency,a.Price));
+            return _cart.Sum(a => CurrencyConverter.ConvertTo(Currency,a.Product.Price)*a.Amount);
+        }
+
+        public void AddToCart(Product product, int amount)
+        {
+            if (amount <= 0) return;
+
+            if (_cart.Any(a => a.Product == product))
+            {
+                _cart.Find(a => a.Product == product).Amount += amount;
+            }
+            else
+            {
+                _cart.Add(new CartItem(){Product = product, Amount = amount});
+            }
         }
 
         public string GetCartInfo()
@@ -36,30 +50,22 @@ namespace Laboration_2
                 retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -20} \n",
                     "Namn", "Antal", "Pris", "Totalt");
 
-                _cart.Sort();
 
-                int counter = 1;
                 decimal totalPrice = 0;
 
-                for (int i = 0; i < _cart.Count; i++)
+                foreach (var item in _cart)
                 {
-                    if (i == _cart.Count - 1 || _cart[i] != _cart[i + 1])
-                    {
-                        decimal convertedPrice = CurrencyConverter.ConvertTo(Currency, _cart[i].Price);
-                        totalPrice += convertedPrice*counter;
 
-                        retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -20} \n",
-                            _cart[i].Name,
-                            $"{counter} {_cart[i].Unit}",
-                            convertedPrice.ToString("0.00") + " " + Currency.ToString(),
-                            (counter * convertedPrice).ToString("0.00") + " " + Currency.ToString());
-                        
-                        counter = 1;
-                    }
-                    else
-                    {
-                        counter++;
-                    }
+                    decimal convertedPrice = CurrencyConverter.ConvertTo(Currency, item.Product.Price);
+                    totalPrice += convertedPrice * item.Amount;
+
+                    retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -20} \n",
+                        item.Product.Name,
+                        $"{item.Amount} {item.Product.Unit}",
+                        convertedPrice.ToString("0.00") + " " + Currency.ToString(),
+                        (item.Amount * convertedPrice).ToString("0.00") + " " + Currency.ToString());
+                    
+ 
                 }
 
                 if (GetTotalPrice() != totalPrice)

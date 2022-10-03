@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -41,54 +42,87 @@ namespace Laboration_2
             }
 
             var customerType = reader.GetInt32();
-            string? name = "";
-            string? password = "";
-            Currecies currency = Currecies.SEK;
+            var name = "";
+            var password = "";
+            var currency = Currecies.SEK;
+            var cart = new List<CartItem>();
 
 
-            if (!reader.Read() || reader.GetString() != "CustomerValue")
+            while (reader.Read())
             {
-                throw new JsonException();
+                if (reader.TokenType == JsonTokenType.EndObject)
+                {
+                    Customer customer = customerType switch
+                    {
+                        0 => new Customer(name, password) {Cart = cart},
+                        1 => new BronzeCustomer(name, password) { Cart = cart },
+                        2 => new SilverCustomer(name, password) { Cart = cart },
+                        3 => new GoldCustomer(name, password) { Cart = cart },
+                        _ => throw new JsonException()
+                    };
+                    customer.Currency = currency;
+                    return customer;
+                }
+
+                if (reader.TokenType == JsonTokenType.PropertyName)
+                {
+                    propertyName = reader.GetString();
+                    reader.Read();
+
+                    switch (propertyName)
+                    {
+                        case "Name":
+                            name = reader.GetString();
+                            break;
+                        case "Password":
+                            password = Decrypt(reader.GetString());
+                            break;
+                        case "Currency":
+                            currency = (Currecies)reader.GetInt32();
+                            break;
+                        case "Cart":
+                            var itemName = string.Empty;
+                            var itemPrice = 0m;
+                            var itemUnit = string.Empty;
+                            var itemAmount = 0;
+
+                            while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                            {
+                                if (reader.TokenType == JsonTokenType.PropertyName)
+                                {
+                                    propertyName = reader.GetString();
+                                    reader.Read();
+
+                                    switch (propertyName)
+                                    {
+                                        case "Name":
+                                            itemName = reader.GetString();
+                                            break;
+                                        case "Unit":
+                                            itemUnit = reader.GetString();
+                                            break;
+                                        case "Price":
+                                            itemPrice = reader.GetDecimal();
+                                            break;
+                                        case "Amount":
+                                            itemAmount = reader.GetInt32();
+                                            break;
+                                        default: throw new JsonException();
+
+                                    }
+                                }
+                                else if (reader.TokenType == JsonTokenType.EndObject)
+                                {
+                                    cart.Add(new CartItem(){ Product = ProductCollection.GetProductByReference(itemName, itemUnit, itemPrice) , Amount = itemAmount});
+                                }
+                            }
+                            break;
+                    }
+                    
+                }
             }
-            if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)
-            {
-                throw new JsonException();
-            }
 
-            Customer customer;
-
-            switch (customerType)
-            {
-                case 0:
-                    customer = (Customer)JsonSerializer.Deserialize(ref reader, typeof(Customer));
-                    break;
-                case 1:
-                    customer = (BronzeCustomer)JsonSerializer.Deserialize(ref reader, typeof(BronzeCustomer));
-                    break;
-                case 2:
-                    customer = (SilverCustomer)JsonSerializer.Deserialize(ref reader, typeof(SilverCustomer));
-                    break;
-                case 3:
-                    customer = (GoldCustomer)JsonSerializer.Deserialize(ref reader, typeof(GoldCustomer));
-                    break;
-                default: throw new JsonException();
-
-            }
-            /*Customer customer = customerType switch
-            {
-                0 => new Customer(name, password),
-                1 => new BronzeCustomer(name, password),
-                2 => new SilverCustomer(name, password),
-                3 => new GoldCustomer(name, password),
-                _ => throw new JsonException()
-            };*/
-
-            if (!reader.Read() || reader.TokenType != JsonTokenType.EndObject)
-            {
-                throw new JsonException();
-            }
-
-            return customer;
+            throw new JsonException();
 
         }
 
@@ -98,7 +132,7 @@ namespace Laboration_2
             if (customer == null) return;
 
             writer.WriteStartObject();
-
+            
             switch (customer)
             {
                 case BronzeCustomer:
@@ -116,31 +150,68 @@ namespace Laboration_2
                     break;
                 default: throw new JsonException();
             }
+            //writer.WritePropertyName("CustomerValue");
+            //JsonSerializer.Serialize(writer, customer);
+            
 
-            writer.WritePropertyName("CustomerValue");
-            JsonSerializer.Serialize(writer, customer);
+            writer.WriteString("Name", customer.Name);
+            writer.WriteString("Password", Encrypt(customer.Password));
+            writer.WriteNumber("Currency", (int)customer.Currency);
 
-            /*writer.WriteString("Name", customer.Name);
-            writer.WriteString("Password", customer.Password); //Säkerhet 101
-            writer.WriteNumber("Currency", (int)customer.Currency);*/
-
-            /*
+            
             writer.WriteStartArray("Cart");
 
             foreach (var cartItem in customer.Cart)
             {
                 writer.WriteStartObject();
 
-                writer.WriteString("Name", cartItem.Name);
-                writer.WriteString("Unit", cartItem.Unit);
-                writer.WriteNumber("Price", cartItem.Price);
+                writer.WriteString("Name", cartItem.Product.Name);
+                writer.WriteString("Unit", cartItem.Product.Unit);
+                writer.WriteNumber("Price", cartItem.Product.Price);
+                writer.WriteNumber("Amount", cartItem.Amount);
 
                 writer.WriteEndObject();
             }
             
             writer.WriteEndArray();
-            */
+            
             writer.WriteEndObject();
+        }
+        private static string Encrypt(string input)
+        {
+            byte byteConstantEven = 0x53;
+            byte byteConstantUneven = 0x32;
+
+
+            byte[] data = Encoding.UTF8.GetBytes(input);
+            for (int i = 0; i < data.Length; i++)
+            {
+                data[i] = (i % 2) switch
+                {
+                    0 => (byte)(data[i] ^ byteConstantEven),
+                    1 => (byte)(data[i] ^ byteConstantUneven)
+                };
+            }
+
+            return Convert.ToBase64String(data);
+        }
+        private static string Decrypt(string input)
+        {
+            byte byteConstantEven = 0x53;
+            byte byteConstantUneven = 0x32;
+
+
+            byte[] data = Convert.FromBase64String(input); ;
+            for (int i = 0; i < data.Length; i++)
+            {
+                data[i] = (i % 2) switch
+                {
+                    0 => (byte)(data[i] ^ byteConstantEven),
+                    1 => (byte)(data[i] ^ byteConstantUneven)
+                };
+            }
+
+            return Encoding.UTF8.GetString(data);
         }
     }
 }

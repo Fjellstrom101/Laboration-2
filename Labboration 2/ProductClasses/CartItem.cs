@@ -8,7 +8,7 @@ namespace Laboration_2
 {
     public class CartItem
     {
-        public string Product { get; set; }
+        public Product? Product { get; set; }
         public int Amount { get; set; }
 
     }

@@ -25,13 +25,13 @@ namespace Laboration_2
             {
                 new MenuItem("Logga in", new Action(ShowLoginPage)),
                 new MenuItem("Registrera ny kund", new Action(ShowRegisterCustomerPage)),
-                new MenuItem("Avsluta", () => { }) // Tom lambda funktion TODO Ändra till en funktion med ett meddelande?
+                new MenuItem("Avsluta", new Action(ShowExitPage)) 
             };
             _mainMenu = new List<MenuItem>()
             {
-                new MenuItem("Handla", new Action(ShowShop)),
+                new MenuItem("Handla", new Action(ShowShopPage)),
                 new MenuItem("Visa Kundvagn", new Action(ShowCart)),
-                new MenuItem("Gå till kassan", new Action(ShowCheckout)),
+                new MenuItem("Gå till kassan", new Action(ShowCheckoutPage)),
                 new MenuItem("Ändra valuta", new Action(ShowChangeCurrencyPage)),
                 new MenuItem("Logga ut", new Action(ShowLogoutPage))
             };
@@ -130,7 +130,8 @@ namespace Laboration_2
             Console.ReadKey();
             ShowMainMenu();
         }
-        public void ShowCheckout()
+        
+        public void ShowCheckoutPage()
         {
             ConsoleTool.ClearConsole();
             string[] cartArr = _currentCustomer.GetCartInfo().Split('\n');
@@ -189,7 +190,7 @@ namespace Laboration_2
             Thread.Sleep(1500);
             ShowMainMenu();
         }
-        public void ShowShop()
+        public void ShowShopPage()
         {
             string[] productMenuArray = new string[ProductCollection.ProductList.Count];
 
@@ -217,10 +218,8 @@ namespace Laboration_2
                     ConsoleTool.ClearConsole();
                     Console.WriteLine($"{amount} {ProductCollection.ProductList[userChoice].Unit} {ProductCollection.ProductList[userChoice].Name} har lagts till i din kundvagn!");
 
-                    for (int j = 0; j < amount; j++)
-                    {
-                        _currentCustomer.Cart.Add(ProductCollection.ProductList[userChoice]);
-                    }
+
+                    _currentCustomer.AddToCart(ProductCollection.ProductList[userChoice], amount);
 
 
                     Thread.Sleep(1500);
@@ -312,6 +311,12 @@ namespace Laboration_2
 
 
             Thread.Sleep(2000);
+        }
+
+        public void ShowExitPage()
+        {
+            ConsoleTool.ClearConsole();
+            Console.WriteLine("Programmet avslutas. Välkommen åter!");
         }
 
 

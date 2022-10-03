@@ -42,6 +42,7 @@ namespace Laboration_2
         {
             int selectedIndex = 0;
             Console.CursorVisible = false;
+            ClearKeyBuffer();
 
             while (true)
             {
@@ -105,6 +106,13 @@ namespace Laboration_2
                 Console.Write(new string(' ', Console.WindowWidth));
             }
             Console.SetCursorPosition(0, top);
+        }
+        public static void ClearKeyBuffer()
+        {
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey(false);
+            }
         }
     }
 }

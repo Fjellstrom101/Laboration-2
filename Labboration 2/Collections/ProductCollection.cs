@@ -16,10 +16,7 @@ namespace Laboration_2
         {
             get
             {
-                if (_productList == null)
-                {
-                    FetchProductsFromFile();
-                }
+                CheckIfListInitialized();
                 return _productList;
             }
         }
@@ -73,6 +70,25 @@ namespace Laboration_2
                 }
             }
             return retString;
+        }
+
+        public static Product GetProductByReference(string name, string unit, decimal price)
+        {
+            CheckIfListInitialized();
+
+            if (_productList.Any(a => a.Name.Equals(name) && a.Unit.Equals(unit) && a.Price == price))
+            {
+                return _productList.Find(a => a.Name.Equals(name) && a.Unit.Equals(unit) && a.Price == price);
+            }
+
+            return null; //TODO Returnera exception?
+        }
+        private static void CheckIfListInitialized()
+        {
+            if (_productList == null)
+            {
+                FetchProductsFromFile();
+            }
         }
     }
 }

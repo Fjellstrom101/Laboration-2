@@ -137,7 +137,6 @@ namespace Laboration_2
             {
                 case BronzeCustomer:
                     writer.WriteNumber("CustomerLevel", 1);
-                    JsonSerializer.Serialize(writer, customer);
                     break;
                 case SilverCustomer:
                     writer.WriteNumber("CustomerLevel", 2);
@@ -150,8 +149,6 @@ namespace Laboration_2
                     break;
                 default: throw new JsonException();
             }
-            //writer.WritePropertyName("CustomerValue");
-            //JsonSerializer.Serialize(writer, customer);
             
 
             writer.WriteString("Name", customer.Name);

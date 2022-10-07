@@ -2,8 +2,9 @@
 
 namespace Laboration_2
 {
-    public abstract class CustomerCollection
+    public static class CustomerCollection
     {
+        //En statisk klass som innehåller en lista med Customers. Här finns alla metoder för att hämta och spara kunder från fil.
         private static List<Customer> _customerList;
         private static readonly string _fileName = "Customers.json";
 
@@ -30,8 +31,8 @@ namespace Laboration_2
             {
                 //Första uppstarten? Skapar förinlagda kunder och spara ner till fil.
                 _customerList.Add(new Customer("Knatte", "123"));
-                _customerList.Add(new Customer("Fnatte", "321"));
-                _customerList.Add(new Customer("Tjatte", "213"));
+                _customerList.Add(new BronzeCustomer("Fnatte", "321"));
+                _customerList.Add(new GoldCustomer("Tjatte", "213"));
                 SaveCustomersToFile();
             }
         }
@@ -73,15 +74,7 @@ namespace Laboration_2
         {
             CheckIfListInitialized();
 
-            outCustomer = _customerList.Find(customer => customer.Name.ToLower().Equals(name.ToLower()));
-
-            if (outCustomer != null)
-            {
-                return outCustomer.VerifyPassword(password);
-            }
-
-            outCustomer = null;
-            return false;
+            return (outCustomer = _customerList.Find(a => a.Name.ToLower().Equals(name.ToLower()) && a.VerifyPassword(password))) != null;
         }
 
         private static void CheckIfListInitialized()

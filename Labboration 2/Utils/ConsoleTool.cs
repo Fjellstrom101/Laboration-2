@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Laboration_2
 {
-    internal class ConsoleTool
+    public static class ConsoleTool
     {
         public static void InvertConsoleColors()
         {
@@ -107,6 +107,7 @@ namespace Laboration_2
             }
             Console.SetCursorPosition(0, top);
         }
+        //Om användaren har varit otålig och tryckt på massa knappar under Thread.Sleep så kommer vi 
         public static void ClearKeyBuffer()
         {
             while (Console.KeyAvailable)

@@ -1,7 +1,8 @@
 ﻿namespace Laboration_2
 {
-    public class Product : IComparable
+    public class Product
     {
+        //En klass som representerar en produkt. Innehåller namn, pris och enhet.
         public string Name { get; set; }
         public decimal Price { get; set; }
 
@@ -14,18 +15,10 @@
             Unit = unit;
         }
 
+        //ToString är implementerad enligt Niklas specifikationer :)
         public override string ToString()
         {
             return $"Namn: \"{Name}\", Pris: {Price} SEK / {Unit}";
-        }
-
-        public int CompareTo(object? obj)
-        {
-            if (obj == null) return 1;
-            if (obj is not Product) return 1;
-            
-            Product product = (Product)obj;
-            return product.Name.CompareTo(Name);
         }
     }
 }

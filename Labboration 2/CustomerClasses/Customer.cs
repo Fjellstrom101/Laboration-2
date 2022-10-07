@@ -92,7 +92,7 @@ namespace Laboration_2
         }
         public override string ToString()
         {
-            String retString = $"Användarnamn: {Name} Lösenord: {Password}\n";
+            String retString = $"Användarnamn: {Name}, Lösenord: {Password}\n";
             retString += GetCartInfo();
             return retString;
         }

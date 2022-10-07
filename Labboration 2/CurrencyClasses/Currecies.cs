@@ -13,4 +13,5 @@ namespace Laboration_2
         GBP,
         USD
     }
+
 }

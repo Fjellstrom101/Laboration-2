@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Laboration_2
 {
 
-    public abstract class ProductCollection
+    public static class ProductCollection
     {
         private static List<Product> _productList;
 
@@ -50,7 +51,12 @@ namespace Laboration_2
 
         public static void SaveProductsToFile()
         {
-            var jsonString = JsonSerializer.Serialize(_productList);
+            CheckIfListInitialized();
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+            var jsonString = JsonSerializer.Serialize(_productList, options);
             File.WriteAllText(_fileName, jsonString);
         }
 
@@ -75,13 +81,7 @@ namespace Laboration_2
         public static Product GetProductByReference(string name, string unit, decimal price)
         {
             CheckIfListInitialized();
-
-            if (_productList.Any(a => a.Name.Equals(name) && a.Unit.Equals(unit) && a.Price == price))
-            {
-                return _productList.Find(a => a.Name.Equals(name) && a.Unit.Equals(unit) && a.Price == price);
-            }
-
-            return null; //TODO Returnera exception?
+            return _productList.Find(a => a.Name.Equals(name) && a.Unit.Equals(unit) && a.Price == price);
         }
         private static void CheckIfListInitialized()
         {

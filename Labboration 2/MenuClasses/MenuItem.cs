@@ -8,10 +8,11 @@ namespace Laboration_2
 {
     public class MenuItem
     {
-        private Action _menuMethod;
+        //En klass som innehåller en string och en Action. Strängens innehåll visas på menyraden och Action:n körs om menynraden väljs av användaren.
+        private readonly Action _menuMethod;
         public Action MenuMethod { get => _menuMethod; }
 
-        private string _menuText;
+        private readonly string _menuText;
         public string MenuText { get => _menuText;}
 
 
@@ -21,18 +22,13 @@ namespace Laboration_2
             _menuText = menuText;
         }
 
+        //En statisk metod som konverterar en lista med MenuItems till en array med strings. Används för att skriva ut menyer.
         public static string[] ToStringArray(List<MenuItem> inList)
         {
-            string[] retArray = new string[inList.Count];
-
-            for (int i = 0; i < retArray.Length; i++)
-            {
-                retArray[i] = inList[i].ToString();
-            }
-
-            return retArray;
+            return Array.ConvertAll(inList.ToArray(), a => a.ToString());
         }
 
+        //ToString(). Retunerar _menuText, alltså texten som ska stå på menyraden.
         public override string ToString()
         {
             return _menuText;

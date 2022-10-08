@@ -9,16 +9,15 @@ namespace Laboration_2
     public class MenuItem
     {
         //En klass som innehåller en string och en Action. Strängens innehåll visas på menyraden och Action:n körs om menynraden väljs av användaren.
-        private readonly Action _menuMethod;
-        public Action MenuMethod { get => _menuMethod; }
+        public Action MenuMethod { get; }
 
         private readonly string _menuText;
-        public string MenuText { get => _menuText;}
+        public string MenuText { get; }
 
 
         public MenuItem(string menuText, Action menuMethod)
         {
-            _menuMethod = menuMethod;
+            MenuMethod = menuMethod;
             _menuText = menuText;
         }
 

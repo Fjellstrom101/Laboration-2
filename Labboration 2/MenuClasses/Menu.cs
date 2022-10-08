@@ -50,7 +50,7 @@ namespace Laboration_2
         public void ShowMainMenu()
         {
             ConsoleTool.ClearConsole();
-            ConsoleTool.WriteMenu(_mainMenu, $"Välkommen!\nInloggad som {_currentCustomer.Name}\n",
+            ConsoleTool.WriteMenu(_mainMenu, $"Välkommen!\nInloggad som {_currentCustomer.Name} ({_currentCustomer.GetCustomerLevel()})\n",
                 "\nAnvänd piltangenterna och ENTER för att välja.");
         }
 
@@ -204,7 +204,7 @@ namespace Laboration_2
         public void ShowChangeCurrencyPage()
         {
             ConsoleTool.ClearConsole();
-            _currentCustomer.Currency = (Currecies) ConsoleTool.WriteMenu(System.Enum.GetNames(typeof(Currecies)), "Välj valuta:", string.Empty);
+            _currentCustomer.Currency = (Currencies) ConsoleTool.WriteMenu(System.Enum.GetNames(typeof(Currencies)), "Välj valuta:", string.Empty);
             
             ConsoleTool.ClearConsole();
             Console.WriteLine($"Valutan ändrades till {_currentCustomer.Currency}");

@@ -11,24 +11,29 @@ namespace Laboration_2
 
     public static class ProductCollection
     {
-        private static List<Product> _productList;
+        //En statisk klass som innehåller alla produkter. Klassen innehåller alla metoder för att spara ner och hämta produkter från fil. 
+        private static List<Product>? _productList;
 
         public static List<Product> ProductList
         {
             get
             {
+                //Kontrollera så att listan är initsierad och produkterna har hämtats från fil innan vi retunerar listan.
                 CheckIfListInitialized();
                 return _productList;
             }
         }
 
-        private static string _fileName = "Products.json";
+        private const string FileName = "Products.json";
 
         private static void FetchProductsFromFile()
         {
+            //En metod som initiserar listan _productList. Sen kontrollerar den ifall filen "Products.json" existerar.
+            //Ifall den gör det hämtas alla produkter från filen och läggs in i listan. Annars skapas "grund produkterna", läggs in i listan och sparas ner till fil.
+
             _productList = new List<Product>();
 
-            if (!File.Exists(_fileName))
+            if (!File.Exists(FileName))
             {
                 //Första gången programmet körs, eller om filen tagits bort
 
@@ -44,47 +49,36 @@ namespace Laboration_2
             }
             else
             {
-                string fileInput = File.ReadAllText(_fileName);
+                string fileInput = File.ReadAllText(FileName);
                 _productList = JsonSerializer.Deserialize<List<Product>>(fileInput)!;
             }
         }
 
         public static void SaveProductsToFile()
         {
+            //En metod som konverterar om listan _productList till JSON och sparar ner till filen "Products.json"
             CheckIfListInitialized();
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true
             };
             var jsonString = JsonSerializer.Serialize(_productList, options);
-            File.WriteAllText(_fileName, jsonString);
-        }
-
-        public static string ToString() //TODO Döpa om till något annat eftersom den inte overridar när den är statisk?
-        {
-            string retString = string.Empty;
-
-            if (_productList.Count != 0)
-            {
-                retString += string.Format("{0,-20} {1,-10}\n",
-                    "Namn", "Pris");
-
-                foreach (var product in _productList)
-                {
-                    retString += string.Format("{0,-20} {1,-10}\n",
-                        product.Name, $"{product.Price} SEK/{product.Unit}");
-                }
-            }
-            return retString;
+            File.WriteAllText(FileName, jsonString);
         }
 
         public static Product GetProductByReference(string name, string unit, decimal price)
         {
+            //En metod som retunerar en produkt. Används när kundernas kundvagnar laddas från fil för att produkterna ska referera till samma objekt som kunderna handlar i shoppen.
+            //Annars skapas dubbletter av objekten, och == går inte att använda även om alla värden i objekten är samma.
+
             CheckIfListInitialized();
-            return _productList.Find(a => a.Name.Equals(name) && a.Unit.Equals(unit) && a.Price == price);
+            return _productList.Find(a => a.Name.Equals(name) && 
+                                          a.Unit.Equals(unit) && 
+                                          a.Price == price);
         }
         private static void CheckIfListInitialized()
         {
+            //Kontrollerar ifall listan är initsierad. Annars körs metoden FetchProductsFromFile()
             if (_productList == null)
             {
                 FetchProductsFromFile();

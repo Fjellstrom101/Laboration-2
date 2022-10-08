@@ -29,7 +29,7 @@ namespace Laboration_2
                 throw new JsonException();
             }
 
-            string? propertyName = reader.GetString();
+            var propertyName = reader.GetString();
             if (propertyName != "CustomerLevel")
             {
                 throw new JsonException();
@@ -44,7 +44,7 @@ namespace Laboration_2
             var customerType = reader.GetInt32();
             var name = "";
             var password = "";
-            var currency = Currecies.SEK;
+            var currency = Currencies.SEK;
             var cart = new List<CartItem>();
 
 
@@ -52,7 +52,7 @@ namespace Laboration_2
             {
                 if (reader.TokenType == JsonTokenType.EndObject)
                 {
-                    Customer customer = customerType switch
+                    var customer = customerType switch
                     {
                         0 => new Customer(name, password) {Cart = cart},
                         1 => new BronzeCustomer(name, password) { Cart = cart },
@@ -78,7 +78,7 @@ namespace Laboration_2
                             password = Decrypt(reader.GetString());
                             break;
                         case "Currency":
-                            currency = (Currecies)reader.GetInt32();
+                            currency = (Currencies)reader.GetInt32();
                             break;
                         case "Cart":
                             var itemName = string.Empty;

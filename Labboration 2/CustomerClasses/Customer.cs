@@ -4,48 +4,54 @@ namespace Laboration_2
 {
     public class Customer
     {
+        //Basklassen kund. Innehåller namn, lösenord, en varukorgs-lista och en vald valuta för kunden.
+
         public string Name { get; private set; }
         public string Password { get; set; }
 
 
-        private List<CartItem> _cart;
-        public List<CartItem> Cart { 
-            get { return _cart; }
-            set { _cart = value; }
-        }
+        public List<CartItem> Cart { get; set; }
 
-        public Currecies Currency { get; set; }
+        public Currencies Currency { get; set; }
         public Customer(string name, string password)
         {
             Name = name;
             Password = password;
-            _cart = new List<CartItem>();
-            Currency = Currecies.SEK;
+            Cart = new List<CartItem>();
+            Currency = Currencies.SEK;
         }
         public virtual decimal GetTotalPrice()
         {
-            return _cart.Sum(a => CurrencyConverter.ConvertTo(Currency,a.Product.Price)*a.Amount);
+            //Hämtar det totala priset för kundvagnen med hjälp av LINQ funktinen Sum. Varornas pris konverteras till vald valuta och gångras med antal.
+            //Här räknas även eventuell rabatt med. Baskunden har 0% rabatt :)
+            return Cart.Sum(a => CurrencyConverter.ConvertTo(Currency,a.Product.Price)*a.Amount);
         }
 
         public void AddToCart(Product product, int amount)
         {
+            //Lägger till en produkt i kundvagnen. Om antalet är noll avbryts metoden.
+            //Om den redan finns i kundvagnen så ökas antalet på just det CartItem:t. Annars läggs det till.
+
             if (amount <= 0) return;
 
-            if (_cart.Any(a => a.Product == product))
+            if (Cart.Any(a => a.Product == product))
             {
-                _cart.Find(a => a.Product == product).Amount += amount;
+                Cart.Find(a => a.Product == product).Amount += amount;
             }
             else
             {
-                _cart.Add(new CartItem(){Product = product, Amount = amount});
+                Cart.Add(new CartItem(){Product = product, Amount = amount});
             }
         }
 
         public string GetCartInfo()
         {
+            //En metod som retunerar en sträng med alla varor i kundvagnen. Första raden innehåller namn på alla kolumner. Om varukorgen är tom retuneras "Kundvagnen är tom!"
+            //En variabel håller även koll på det orabatterade totalpriset. Ifall det skiljer sig från priset retunerat av metoden GetTotalPrice() skrivs även den totala rabatten ut.
+            //Sist av allt skrivs totalpriset ut.
             string retString = string.Empty;
 
-            if (_cart.Count()!=0)
+            if (Cart.Count()!=0)
             {
                 retString += string.Format("{0,-20} {1,-10} {2,-10} {3, -20} \n",
                     "Namn", "Antal", "Pris", "Totalt");
@@ -53,7 +59,7 @@ namespace Laboration_2
 
                 decimal totalPrice = 0;
 
-                foreach (var item in _cart)
+                foreach (var item in Cart)
                 {
 
                     decimal convertedPrice = CurrencyConverter.ConvertTo(Currency, item.Product.Price);
@@ -71,7 +77,7 @@ namespace Laboration_2
                 if (GetTotalPrice() != totalPrice)
                 {
                     retString += string.Format("\n{0,-20} {1,-10} {2,-10} {3, -20} ",
-                        string.Empty, string.Empty, "Rabatt:", $"{totalPrice-GetTotalPrice()} {Currency.ToString()}");
+                        string.Empty, string.Empty, $"Rabatt:", $"{totalPrice-GetTotalPrice()} {Currency.ToString()}");
                 }
 
                 retString += string.Format("\n{0,-20} {1,-10} {2,-10} {3, -20} ",
@@ -88,10 +94,18 @@ namespace Laboration_2
         }
         public bool VerifyPassword(string password)
         {
+            //En metod för att verifiera lösenord enligt Niklas specifikation. Det hade ju gått att göra med LINQ :)
             return Password.Equals(password);
+        }
+
+        public virtual string GetCustomerLevel()
+        {
+            //En metod som används för att få ut kundnivån.
+            return "Baskund";
         }
         public override string ToString()
         {
+            //ToString implementerad enligt Niklas specifikation. Lite farligt att skriva ut användarens lösenord i ren text :)
             String retString = $"Användarnamn: {Name}, Lösenord: {Password}\n";
             retString += GetCartInfo();
             return retString;

@@ -8,16 +8,17 @@ namespace Laboration_2
 {
     public static class CurrencyConverter
     {
-        public static decimal ConvertTo(Currecies currecy, decimal price)
+        //En statisk klass som innehåller en metod för att konvertera valuta. Valutorna och omvandlingskursen sparas i en Dictionary för att slippa använda massor med If satser. Beloppet avrundas till två decimaler
+        public static decimal ConvertTo(Currencies currency, decimal price)
         {
-            var d = new Dictionary<Currecies, decimal> //TODO Ändra namnet?
+            var d = new Dictionary<Currencies, decimal> //TODO Ändra namnet?
             {
-                { Currecies.EUR, 0.092m },
-                { Currecies.GBP, 0.082m },
-                { Currecies.USD, 0.088m },
-                { Currecies.SEK, 1m }
+                { Currencies.EUR, 0.092m },
+                { Currencies.GBP, 0.082m },
+                { Currencies.USD, 0.088m },
+                { Currencies.SEK, 1m }
             };
-            return Math.Round(price * d[currecy], 2);
+            return Math.Round(price * d[currency], 2);
         }
     }
 }

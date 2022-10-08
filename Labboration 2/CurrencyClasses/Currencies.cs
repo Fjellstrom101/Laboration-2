@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Laboration_2
 {
-    public enum Currecies
+    public enum Currencies
     {
+        //En enum med alla valutor som går att välja.
         SEK,
         EUR,
         GBP,

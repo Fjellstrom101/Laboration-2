@@ -2,6 +2,7 @@
 {
     public class BronzeCustomer : Customer
     {
+        //Klassen för Bronskund. Ärver från grundklassen Customer
         public BronzeCustomer(string name, string password) : base(name, password)
         {
         }

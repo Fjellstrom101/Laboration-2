@@ -6,7 +6,7 @@ namespace Laboration_2
     {
         //Basklassen kund. Innehåller namn, lösenord, en varukorgs-lista och en vald valuta för kunden.
 
-        public string Name { get; private set; }
+        public string Name { get; }
         public string Password { get; set; }
 
 

@@ -1,7 +1,8 @@
 ﻿namespace Laboration_2
 {
-    internal class SilverCustomer : Customer
+    public class SilverCustomer : Customer
     {
+        //Klassen för Silverkund. Ärver från grundklassen Customer
         public SilverCustomer(string name, string password) : base(name, password)
         {
         }
